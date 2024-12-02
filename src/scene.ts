@@ -1,5 +1,5 @@
 import Editor from "./editor"
-import { initBuffer, initProgram } from "./program"
+import { initProgram, loadTexture, setupAttribute } from "./program"
 
 export default class FengScene {
     gl: WebGLRenderingContext
@@ -28,7 +28,9 @@ export default class FengScene {
     }
     private setup() {
         this.currentProgram = this.setupProgram()
-        this.setupVertex(this.currentProgram)
+        this.gl.useProgram(this.currentProgram)
+        this.setupVertex()
+        this.setupTexture(this.currentProgram)
     }
     private setupProgram() {
         const gl = this.gl
@@ -37,24 +39,32 @@ export default class FengScene {
         const program = initProgram(gl, vsCode, fsCode)
         return program
     }
-    private setupVertex(program: WebGLProgram) {
-        const gl = this.gl
+    private setupVertex() {
         const vertexPosition = new Float32Array([
             0.5, 0.5,
             -0.5, 0.5,
             0.5, -0.5,
             -0.5, -0.5,
         ]);
-        {
-            initBuffer(gl, vertexPosition)
-            const vertexLocation = gl.getAttribLocation(program, 'aVertexPosition')
-            const size = 2
-            const normalized = false
-            const stride = 0
-            const offset = 0
-            gl.vertexAttribPointer(vertexLocation, size, gl.FLOAT, normalized, stride, offset)
-            gl.enableVertexAttribArray(vertexLocation)
-        }
+        setupAttribute(this.gl, vertexPosition, 'aVertexPosition', 2)
+    }
+    private async setupTexture(program: WebGLProgram) {
+        const gl = this.gl
+        const textureCoords = new Float32Array([
+            1.0, 0.0,
+            0.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+        ])
+        setupAttribute(gl, textureCoords, 'aTextureCoord', 2)
+        loadTexture(gl, 'fox.png').then(() => {
+            this.gameLoop()
+        })
+        // 2d 图形贴图不需要翻转 Y 轴
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+        gl.activeTexture(gl.TEXTURE0)
+        const samplerLocation = gl.getUniformLocation(program, 'uSampler')
+        gl.uniform1i(samplerLocation, 0)
     }
     private update() {
         const gl = this.gl

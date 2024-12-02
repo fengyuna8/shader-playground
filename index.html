@@ -72,22 +72,29 @@
         <div class="feng-flex-item">
           <div class="feng-shader">
             <h4>vertex shader</h4>
-            <div id="id-shader-vertex">attribute vec4 aVertexPosition;
+            <div id="id-shader-vertex">attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+varying highp vec2 vTextureCoord;
+
 
 void main() {
-    gl_Position = aVertexPosition;
+    gl_Position = vec4(aVertexPosition, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
 }</div> 
           </div>
           <div class="feng-shader">
             <h4>fragment shader</h4>
-            <div id='id-shader-fragment'>void main() {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            <div id='id-shader-fragment'>varying highp vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main() {
+    gl_FragColor = texture2D(uSampler, vTextureCoord);
 }</div>
           </div>
         </div>
         <div class="feng-flex-item">
           <h4>canvas result</h4>
-          <canvas id="game-webgl" width="800" height="450" class="feng-canvas"></canvas>
+          <canvas id="game-webgl" width="400" height="400" class="feng-canvas"></canvas>
         </div>
       </div>
     </div>
