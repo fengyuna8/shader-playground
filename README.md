@@ -7,5 +7,7 @@
 测试的时候在 Vertex Shader 和 Fragment Shader 编辑区域写好对应的 Shader 内容，然后点击按钮运行测试
 
 #### 调整颜色
+![调整颜色演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/color.gif)
 
 #### 贴图马赛克
+![调整颜色演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/mosaic.gif)
