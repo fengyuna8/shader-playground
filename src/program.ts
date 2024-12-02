@@ -1,5 +1,3 @@
-import * as mat4 from './mat4'
-
 function loadShader(gl: WebGLRenderingContext, type: GLenum, source: string) {
     const shader = gl.createShader(type)!
     gl.shaderSource(shader, source)
