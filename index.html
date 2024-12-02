@@ -84,11 +84,13 @@ void main() {
           </div>
           <div class="feng-shader">
             <h4>fragment shader</h4>
-            <div id='id-shader-fragment'>varying highp vec2 vTextureCoord;
+            <div id='id-shader-fragment'>precision mediump float;
+varying highp vec2 vTextureCoord;
 uniform sampler2D uSampler;
 
 void main() {
-    gl_FragColor = texture2D(uSampler, vTextureCoord);
+    vec2 coord = vTextureCoord;
+    gl_FragColor = texture2D(uSampler, coord);
 }</div>
           </div>
         </div>
