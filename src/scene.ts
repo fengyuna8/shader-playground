@@ -1,10 +1,12 @@
 import Editor from "./editor"
 import { initProgram, loadTexture, setupAttribute } from "./program"
+import { vsSample1 } from "./shader/vertex"
+import { fsSample1 } from "./shader/fragment"
 
 export default class FengScene {
     gl: WebGLRenderingContext
-    vsEditor: Editor
-    fsEditor: Editor
+    vsEditor: Editor | null = null
+    fsEditor: Editor | null = null
     private currentProgram: WebGLProgram | null = null
     private lastVsCode: string | null = null
     private lastFsCode: string | null = null
@@ -19,23 +21,28 @@ export default class FengScene {
         if (canvas === null) {
             throw new Error(`canvas is null, ${canvasSelector} is error`)
         }
-        this.vsEditor = new Editor(vsEditorSelector)
-        this.fsEditor = new Editor(fsEditorSelector)
         const gl = canvas.getContext('webgl') as WebGLRenderingContext
         gl.viewport(0, 0, canvas.width, canvas.height)
         this.gl = gl
-        this.setup()
+        this.setup(vsEditorSelector, fsEditorSelector)
     }
-    private setup() {
+    private setup(vsEditorSelector: string, fsEditorSelector: string) {
+        this.setupEditor(vsEditorSelector, fsEditorSelector)
         this.currentProgram = this.setupProgram()
         this.gl.useProgram(this.currentProgram)
         this.setupVertex()
         this.setupTexture(this.currentProgram)
     }
+    private setupEditor(vsEditorSelector: string, fsEditorSelector: string) {
+        this.vsEditor = new Editor(vsEditorSelector)
+        this.vsEditor.setValue(vsSample1)
+        this.fsEditor = new Editor(fsEditorSelector)
+        this.fsEditor.setValue(fsSample1)
+    }
     private setupProgram() {
         const gl = this.gl
-        const vsCode = this.vsEditor.getValue()
-        const fsCode = this.fsEditor.getValue()
+        const vsCode = this.vsEditor!.getValue()
+        const fsCode = this.fsEditor!.getValue()
         const program = initProgram(gl, vsCode, fsCode)
         return program
     }

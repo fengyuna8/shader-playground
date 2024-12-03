@@ -9,4 +9,8 @@ export default class Editor {
     getValue() {
         return this.editor.getValue()
     }
+    setValue(value: string) {
+        // cursorPos Where to set the new value. `undefined` or 0 is selectAll, -1 is at the document start, and 1 is at the end
+        this.editor.setValue(value, 1)
+    }
 }
