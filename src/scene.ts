@@ -75,8 +75,8 @@ export default class FengScene {
     }
     private update() {
         const gl = this.gl
-        const vsCode = this.vsEditor.getValue()
-        const fsCode = this.fsEditor.getValue()
+        const vsCode = this.vsEditor!.getValue()
+        const fsCode = this.fsEditor!.getValue()
         if (vsCode !== this.lastVsCode || fsCode !== this.lastFsCode) {
             this.currentProgram = initProgram(gl, vsCode, fsCode)
             this.lastVsCode = vsCode
