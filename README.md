@@ -10,4 +10,10 @@
 ![调整颜色演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/color.gif)
 
 #### 贴图马赛克
-![调整颜色演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/mosaic.gif)
+![调整马赛克演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/mosaic.gif)
+
+### 滑条改变值1
+![滑条改变参数演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/slider-sin.gif)
+
+### 滑条改变值2
+![滑条改变size演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/slider-size.gif)
