@@ -1,4 +1,4 @@
-import FengScene from "./scene";
+import FengScene from "./game/scene";
 
 const bindEvent = (scene: FengScene) => {
     const button = document.querySelector('#id-button-run') as HTMLButtonElement

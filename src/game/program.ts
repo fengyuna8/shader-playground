@@ -1,11 +1,11 @@
-import * as mat4 from './mat4'
+import * as mat4 from '../math/mat4'
 
 function loadShader(gl: WebGLRenderingContext, type: GLenum, source: string) {
     const shader = gl.createShader(type)!
     gl.shaderSource(shader, source)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`)
+        // throw new Error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`)
     }
     return shader
 }
@@ -19,7 +19,7 @@ export function initProgram(gl: WebGLRenderingContext, vsSource: string, fsSourc
     gl.attachShader(program, fragmentShader)
     gl.linkProgram(program)
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(program)}`)
+        // throw new Error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(program)}`)
     }
 
     return program

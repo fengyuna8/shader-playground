@@ -1,7 +1,7 @@
-import Editor from "./editor/editor"
+import Editor from "../editor/editor"
 import { initProgram, loadTexture, setupAttribute } from "./program"
-import { vsSample1 } from "./shader/vertex"
-import { fsSample1 } from "./shader/fragment"
+import { vsSample1 } from "../shader/vertex"
+import { fsSample1 } from "../shader/fragment"
 
 export default class FengScene {
     gl: WebGLRenderingContext

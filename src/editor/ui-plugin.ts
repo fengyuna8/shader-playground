@@ -1,4 +1,4 @@
-import Message, { MessageType } from "../message"
+import Message, { MessageType } from "./message"
 
 export default class UISlider {
     private value: number

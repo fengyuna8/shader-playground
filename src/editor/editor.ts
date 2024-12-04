@@ -1,5 +1,5 @@
-import Message, { MessageType } from "../message"
-import Tokenizer from "../token"
+import Message, { MessageType } from "./message"
+import Tokenizer from "./token"
 import UISlider from "./ui-plugin"
 
 export default class Editor {
