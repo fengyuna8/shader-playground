@@ -47,7 +47,8 @@ export default class Message {
     private _unregisterEventListener<T>(messageType: MessageType, action: (messageType: MessageType, data: T) => void) {
         if (this.eventActions.has(messageType)) {
             const actions = this.eventActions.get(messageType)!
-            this.eventActions.set(messageType, [])
+            // 参数是 action，所以箭头函数的参数名称换成了 a
+            this.eventActions.set(messageType, actions.filter(a => a !== action))
         } else {
             ensure(false, `注销消息<${messageType}>不存在`)
         }
