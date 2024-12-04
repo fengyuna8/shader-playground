@@ -65,7 +65,7 @@ export default class FengScene {
         ])
         setupAttribute(gl, textureCoords, 'aTextureCoord', 2)
         loadTexture(gl, 'fox.png').then(() => {
-            this.gameLoop()
+            this.gameLoop(performance.now())
         })
         // 2d 图形贴图不需要翻转 Y 轴
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
@@ -73,7 +73,7 @@ export default class FengScene {
         const samplerLocation = gl.getUniformLocation(program, 'uSampler')
         gl.uniform1i(samplerLocation, 0)
     }
-    private update() {
+    private update(now: number) {
         const gl = this.gl
         const vsCode = this.vsEditor!.getValue()
         const fsCode = this.fsEditor!.getValue()
@@ -83,6 +83,8 @@ export default class FengScene {
             this.lastFsCode = fsCode
         }
         gl.useProgram(this.currentProgram)
+        const timeLocation = gl.getUniformLocation(gl.getParameter(gl.CURRENT_PROGRAM), 'uTime')
+        gl.uniform1f(timeLocation, now / 1000)
     }
     private clear() {
         const gl = this.gl
@@ -97,13 +99,13 @@ export default class FengScene {
         const count = 4
         gl.drawArrays(gl.TRIANGLE_STRIP, offset, count)
     }
-    gameLoop() {
-        this.update()
+    gameLoop(now: number) {
+        this.update(now)
         this.clear()
         this.draw()
         // 暂时不做成每帧更新
         // requestAnimationFrame(() => {
-        //     this.gameLoop()
+        //     this.gameLoop(now)
         // })
     }
 }
