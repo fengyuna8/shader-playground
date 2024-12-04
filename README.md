@@ -12,8 +12,8 @@
 #### 贴图马赛克
 ![调整马赛克演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/mosaic.gif)
 
-### 滑条改变值1
+### 改变波的参数
 ![滑条改变参数演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/slider-sin.gif)
 
-### 滑条改变值2
+### 滑条 size
 ![滑条改变size演示](https://github.com/fengyuna8/shader-playground/blob/master/showcase/slider-size.gif)
