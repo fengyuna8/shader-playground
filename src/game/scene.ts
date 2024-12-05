@@ -160,8 +160,8 @@ export default class FengScene {
         this.clear()
         this.draw()
         // 暂时不做成每帧更新
-        // requestAnimationFrame(() => {
-        //     this.gameLoop(now)
-        // })
+        requestAnimationFrame(() => {
+            this.gameLoop(now)
+        })
     }
 }
