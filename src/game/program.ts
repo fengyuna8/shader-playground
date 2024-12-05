@@ -10,7 +10,7 @@ function loadShader(gl: WebGLRenderingContext, type: GLenum, source: string) {
     return shader
 }
 
-export function initProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string) {
+export function createProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string) {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource)
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource)
 
@@ -25,7 +25,7 @@ export function initProgram(gl: WebGLRenderingContext, vsSource: string, fsSourc
     return program
 }
 
-export function initBuffer(gl: WebGLRenderingContext, data: ArrayBuffer) {
+export function createBuffer(gl: WebGLRenderingContext, data: ArrayBuffer) {
     const buffer = gl.createBuffer()!
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
@@ -33,7 +33,7 @@ export function initBuffer(gl: WebGLRenderingContext, data: ArrayBuffer) {
 }
 
 export function setupAttribute(gl: WebGLRenderingContext, data: Float32Array, attributeName: string, size: number) {
-    initBuffer(gl, data)
+    createBuffer(gl, data)
     const program = gl.getParameter(gl.CURRENT_PROGRAM)
     const location = gl.getAttribLocation(program, attributeName)
     const stride = 0
@@ -90,23 +90,29 @@ export async function loadTexture(gl: WebGLRenderingContext, path: string) {
 }
 
 export function createProjectionMatrix(aspectRatio: number) {
-    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const fieldOfView = (45 * Math.PI) / 180
     const aspect = aspectRatio
-    const zNear = 0.1;
-    const zFar = 100.0;
-    const projectionMatrix = mat4.create();
+    const zNear = 0.1
+    const zFar = 100.0
+    const projectionMatrix = mat4.create()
   
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar)
     return projectionMatrix
 }
 
-export function createModelViewMatrix() {
-    const modelViewMatrix = mat4.create();
+export function createModelViewMatrix(rotation: number) {
+    const modelViewMatrix = mat4.create()
   
     mat4.translate(
       modelViewMatrix,
       modelViewMatrix,
       [-0.0, 0.0, -6.0]
+    )
+    mat4.rotate(
+        modelViewMatrix, 
+        modelViewMatrix,
+        rotation,
+        [0, 1, 1],
     )
     return modelViewMatrix
 }

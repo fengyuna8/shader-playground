@@ -1,15 +1,16 @@
 import Editor from "../editor/editor"
-import { initProgram, loadTexture, setupAttribute } from "./program"
+import { createModelViewMatrix, createProgram, createProjectionMatrix, loadTexture, setupAttribute } from "./program"
 import { vsSample1 } from "../shader/vertex"
 import { fsSample1 } from "../shader/fragment"
 
 export default class FengScene {
-    gl: WebGLRenderingContext
-    vsEditor: Editor | null = null
-    fsEditor: Editor | null = null
-    private currentProgram: WebGLProgram | null = null
+    private gl: WebGLRenderingContext
+    private program: WebGLProgram
+    private vsEditor: Editor | null = null
+    private fsEditor: Editor | null = null
     private lastVsCode: string | null = null
     private lastFsCode: string | null = null
+    private rotation: number = 0
     /**
      * @param canvasSelector canvas元素的选择器
      * @param vsEditorSelector vertex shader 元素的 id 选择器，不需要带 #
@@ -21,17 +22,19 @@ export default class FengScene {
         if (canvas === null) {
             throw new Error(`canvas is null, ${canvasSelector} is error`)
         }
+        this.setupEditor(vsEditorSelector, fsEditorSelector)
         const gl = canvas.getContext('webgl') as WebGLRenderingContext
         gl.viewport(0, 0, canvas.width, canvas.height)
         this.gl = gl
-        this.setup(vsEditorSelector, fsEditorSelector)
+        this.program = this.setupProgram()
+        this.gl.useProgram(this.program)
+        this.setup()
     }
-    private setup(vsEditorSelector: string, fsEditorSelector: string) {
-        this.setupEditor(vsEditorSelector, fsEditorSelector)
-        this.currentProgram = this.setupProgram()
-        this.gl.useProgram(this.currentProgram)
+    private setup() {
         this.setupVertex()
-        this.setupTexture(this.currentProgram)
+        this.setupIndex()
+        this.setupTexture()
+        this.setupMatrix()
     }
     private setupEditor(vsEditorSelector: string, fsEditorSelector: string) {
         this.vsEditor = new Editor(vsEditorSelector)
@@ -43,61 +46,114 @@ export default class FengScene {
         const gl = this.gl
         const vsCode = this.vsEditor!.getValue()
         const fsCode = this.fsEditor!.getValue()
-        const program = initProgram(gl, vsCode, fsCode)
+        const program = createProgram(gl, vsCode, fsCode)
         return program
     }
     private setupVertex() {
-        const vertexPosition = new Float32Array([
-            0.5, 0.5,
-            -0.5, 0.5,
-            0.5, -0.5,
-            -0.5, -0.5,
-        ]);
-        setupAttribute(this.gl, vertexPosition, 'aVertexPosition', 2)
-    }
-    private async setupTexture(program: WebGLProgram) {
         const gl = this.gl
+        const vertexPosition = new Float32Array([
+            -1.0, -1.0, 1.0,
+            1.0, -1.0, 1.0,
+            1.0, 1.0, 1.0,
+            -1.0, 1.0, 1.0,
+            -1.0, -1.0, -1.0,
+            -1.0, 1.0, -1.0,
+            1.0, 1.0, -1.0,
+            1.0, -1.0, -1.0,
+            -1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0,
+            1.0, 1.0, -1.0,
+            -1.0, -1.0, -1.0,
+            1.0, -1.0, -1.0,
+            1.0, -1.0, 1.0,
+            -1.0, -1.0, 1.0,
+            1.0, -1.0, -1.0,
+            1.0, 1.0, -1.0,
+            1.0, 1.0, 1.0,
+            1.0, -1.0, 1.0,
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0, 1.0,
+            -1.0, 1.0, 1.0,
+            -1.0, 1.0, -1.0,
+        ]);
+        setupAttribute(gl, vertexPosition, 'aVertexPosition', 3)
         const textureCoords = new Float32Array([
-            1.0, 0.0,
-            0.0, 0.0,
-            1.0, 1.0,
-            0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
         ])
         setupAttribute(gl, textureCoords, 'aTextureCoord', 2)
+    }
+    private async setupTexture() {
+        const gl = this.gl
         loadTexture(gl, 'fox.png').then(() => {
             this.gameLoop(performance.now())
         })
-        // 2d 图形贴图不需要翻转 Y 轴
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
         gl.activeTexture(gl.TEXTURE0)
-        const samplerLocation = gl.getUniformLocation(program, 'uSampler')
+        const samplerLocation = gl.getUniformLocation(this.program, 'uSampler')
         gl.uniform1i(samplerLocation, 0)
+    }
+    private setupIndex() {
+        const gl = this.gl
+        const indices = new Uint16Array([
+            0, 1, 2, 0, 2, 3,
+            4, 5, 6, 4, 6, 7,
+            8, 9, 10, 8, 10, 11,
+            12, 13, 14, 12, 14, 15,
+            16, 17, 18, 16, 18, 19,
+            20, 21, 22, 20, 22,23,
+        ])
+        const buffer = gl.createBuffer()
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW)
+    }
+    private setupMatrix() {
+        const gl = this.gl
+        {
+            const projection = createProjectionMatrix(gl.canvas.width / gl.canvas.height)
+            const location = gl.getUniformLocation(this.program, 'uProjectionMatrix')
+            gl.uniformMatrix4fv(location, false, projection)
+        }
+        {
+            const modelView = createModelViewMatrix(this.rotation)
+            const location = gl.getUniformLocation(this.program, 'uModelViewMatrix')
+            gl.uniformMatrix4fv(location, false, modelView)
+        }
     }
     private update(now: number) {
         const gl = this.gl
         const vsCode = this.vsEditor!.getValue()
         const fsCode = this.fsEditor!.getValue()
         if (vsCode !== this.lastVsCode || fsCode !== this.lastFsCode) {
-            this.currentProgram = initProgram(gl, vsCode, fsCode)
+            this.program = createProgram(gl, vsCode, fsCode)
+            gl.useProgram(this.program)
             this.lastVsCode = vsCode
             this.lastFsCode = fsCode
         }
-        gl.useProgram(this.currentProgram)
-        const timeLocation = gl.getUniformLocation(gl.getParameter(gl.CURRENT_PROGRAM), 'uTime')
+        this.rotation += 0.005
+        this.setupMatrix()
+        const timeLocation = gl.getUniformLocation(this.program, 'uTime')
         gl.uniform1f(timeLocation, now / 1000)
     }
     private clear() {
         const gl = this.gl
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        gl.clearDepth(1.0)
         gl.enable(gl.DEPTH_TEST)
+        gl.depthFunc(gl.LEQUAL)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     }
 
     private draw() {
         const gl = this.gl
         const offset = 0
-        const count = 4
-        gl.drawArrays(gl.TRIANGLE_STRIP, offset, count)
+        const count = 36
+        gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset)
     }
     gameLoop(now: number) {
         this.update(now)
